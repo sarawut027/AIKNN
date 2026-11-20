@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 import pandas as pd
@@ -73,6 +74,66 @@ html, body, [class*="css"] {
     font-weight: 700;
     margin: 0 0 0.4rem 0;
     line-height: 1.3;
+}
+
+
+.hero-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.hero-left {
+    flex: 1 1 420px;
+}
+
+.cco-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    padding: 0.7rem 1rem;
+    backdrop-filter: blur(8px);
+    min-width: 260px;
+}
+
+.cco-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 18%;
+    border: 2px solid #FDA4AF;
+    flex-shrink: 0;
+}
+
+.cco-role {
+    display: inline-block;
+    background: #E11D48;
+    color: #FFFFFF;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    margin-bottom: 0.2rem;
+}
+
+.cco-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.25;
+}
+
+.cco-meta {
+    font-size: 0.78rem;
+    color: #CBD5E1;
+    line-height: 1.35;
 }
 
 .hero-subtitle {
@@ -159,6 +220,16 @@ html, body, [class*="css"] {
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
 DATA_PATH = Path(__file__).parent / "Heart3.csv"
+
+AVATAR_PATH = Path(__file__).parent / "assets" / "Sarawut.jpg"
+
+
+@st.cache_data
+def get_avatar_base64() -> str:
+    if not AVATAR_PATH.exists():
+        return ""
+    return base64.b64encode(AVATAR_PATH.read_bytes()).decode("utf-8")
+
 
 
 @st.cache_data
@@ -268,15 +339,34 @@ bundle = get_trained_model(
 metrics = bundle.metrics
 
 # ---------------- Hero Banner ----------------
+avatar_b64 = get_avatar_base64()
+avatar_img_html = (
+    f'<img src="data:image/jpeg;base64,{avatar_b64}" class="cco-avatar" alt="Mr.Sarawut Auiyahan" />'
+    if avatar_b64
+    else ""
+)
+
 st.markdown(
-    """
+    f"""
     <div class="hero-banner">
-        <div class="hero-badge">Machine Learning • K-Nearest Neighbors (KNN)</div>
-        <div class="hero-title">❤️ ระบบวิเคราะห์และจำแนกความเสี่ยงโรคหัวใจ</div>
-        <p class="hero-subtitle">
-            เว็บแอปพลิเคชันสำหรับวิเคราะห์ชุดข้อมูล <b>Heart3.csv</b> ฝึกสอนและปรับจูนโมเดล <b>KNN</b>
-            พร้อมระบบทำนายผลผู้ป่วยรายบุคคลและการทำนายชุดข้อมูลใหม่แบบไฟล์ CSV
-        </p>
+        <div class="hero-inner">
+            <div class="hero-left">
+                <div class="hero-badge">Machine Learning • K-Nearest Neighbors (KNN)</div>
+                <div class="hero-title">❤️ ระบบวิเคราะห์และจำแนกความเสี่ยงโรคหัวใจ</div>
+                <p class="hero-subtitle">
+                    เว็บแอปพลิเคชันสำหรับวิเคราะห์ชุดข้อมูล <b>Heart3.csv</b> ฝึกสอนและปรับจูนโมเดล <b>KNN</b>
+                    พร้อมระบบทำนายผลผู้ป่วยรายบุคคลและการทำนายชุดข้อมูลใหม่แบบไฟล์ CSV
+                </p>
+            </div>
+            <div class="cco-card">
+                {avatar_img_html}
+                <div>
+                    <div class="cco-role">CCO</div>
+                    <div class="cco-name">Mr.Sarawut Auiyahan</div>
+                    <div class="cco-meta">674230027 • 67/44<br>Information Technology (NPRU)</div>
+                </div>
+            </div>
+        </div>
     </div>
     """,
     unsafe_allow_html=True,
